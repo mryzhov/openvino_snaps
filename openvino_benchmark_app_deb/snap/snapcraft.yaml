@@ -1,0 +1,45 @@
+name: openvino-benchmark-app # you probably want to 'snapcraft register <name>'
+base: core22 # the base snap is the execution environment for this snap
+version: '2023.3.0' # just for humans, typically '1.2+git' or '1.3.2'
+summary: OpenVINO toolkit libraries # 79 char long summary
+description: |
+  OpenVINO toolkit full description
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+apps:
+  openvino-benchmark-app:
+    command: usr/samples_bin/benchmark_app
+
+package-repositories:
+  - type: apt
+    components: [main]
+    suites: [ubuntu20]
+    key-id: E9BF0AFC46D6E8B7DA5882F1BAC6F0C353D04109
+    url: https://apt.repos.intel.com/openvino/2023
+
+parts:
+  openvino-benchmark-build:
+    plugin: cmake
+    source-type: git
+    source: https://github.com/openvinotoolkit/openvino.git
+    source-branch: releases/2023/3
+    override-build: |
+      cmake $SNAPCRAFT_PART_SRC/samples/cpp
+      cmake --build .
+      cmake --install . --component samples_bin --prefix $SNAPCRAFT_PART_INSTALL/usr/
+    build-environment:
+      - CMAKE_BUILD_PARALLEL_LEVEL: ${SNAPCRAFT_PARALLEL_BUILD_COUNT}
+      - CMAKE_BUILD_TYPE: Release
+    build-packages:
+      - build-essential
+      - ninja-build
+      - pkg-config
+      - gzip
+      - openvino-libraries-dev
+    stage-packages:
+      - openvino-libraries-2023.3.0
+    prime:
+      - usr/samples_bin/benchmark_app
+      - usr/lib
