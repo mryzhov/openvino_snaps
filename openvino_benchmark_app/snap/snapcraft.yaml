@@ -20,11 +20,13 @@ plugs:
     interface: content
     content: openvino-libs
     target: $SNAP/openvino-libs
+    default-provider: openvino-libs-test
 
   openvino-3rdparty-libs:
     interface: content
     content: openvino-extra-libs
     target: $SNAP/openvino-extra-libs
+    default-provider: openvino-libs-test
 
 parts:
   openvino-build:
@@ -49,7 +51,5 @@ parts:
       - gzip
     build-snaps:
       - openvino-libs-test
-    # stage-snaps:
-    #   - openvino-libs-test
     prime:
       - usr/local/samples_bin/benchmark_app
